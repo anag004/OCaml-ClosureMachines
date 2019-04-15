@@ -1,0 +1,1643 @@
+   0  $accept : %entry% $end
+
+   1  main : expr0 EOF
+
+   2  expr0 : expr1
+   3        | expr0 DISJ expr1
+
+   4  expr1 : expr2
+   5        | expr1 CONJ expr2
+
+   6  expr2 : expr3
+   7        | NOT expr3
+
+   8  expr3 : expr4
+   9        | expr3 GT expr4
+  10        | expr3 LT expr4
+  11        | expr3 GT EQ expr4
+  12        | expr3 LT EQ expr4
+  13        | expr3 EQ expr4
+
+  14  expr4 : expr5
+  15        | expr4 PLUS expr5
+  16        | expr4 MINUS expr5
+
+  17  expr5 : expr6
+  18        | expr5 DIV expr6
+  19        | expr5 REM expr6
+  20        | expr5 TIMES expr6
+
+  21  expr6 : expr7
+  22        | ABS expr7
+
+  23  expr7 : expr8
+  24        | TILDA expr8
+
+  25  expr8 : expr9
+  26        | IF expr0 THEN expr0 ELSE expr0 FI
+
+  27  expr9 : expr10
+  28        | function_call
+
+  29  expr10 : INT
+  30         | BOOL
+  31         | ID
+  32         | ntuple
+  33         | PROJ LP INT COMMA INT RP expr9
+  34         | LP expr0 RP
+  35         | LET def IN expr0 END
+  36         | function_abstraction
+
+  37  ntuple : LP expr0 COMMA tuple_tail
+
+  38  tuple_tail : expr0 RP
+  39             | expr0 COMMA tuple_tail
+
+  40  def : term_def
+  41      | def PARALLEL term_def
+  42      | def SEMICOLON term_def
+
+  43  term_def : simple_def
+  44           | local_def
+
+  45  simple_def : DEF ID EQ expr0
+
+  46  local_def : LOCAL def IN def END
+
+  47  function_abstraction : BACKSLASH ID DOT expr10
+
+  48  function_call : expr10 LP expr0 RP
+
+  49  %entry% : '\001' main
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . main  (49)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	main  goto 14
+	expr0  goto 15
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	expr10 : INT .  (29)
+
+	.  reduce 29
+
+
+state 4
+	expr10 : BOOL .  (30)
+
+	.  reduce 30
+
+
+state 5
+	expr10 : ID .  (31)
+
+	.  reduce 31
+
+
+state 6
+	expr6 : ABS . expr7  (22)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr7  goto 29
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 7
+	expr7 : TILDA . expr8  (24)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr8  goto 30
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 8
+	expr2 : NOT . expr3  (7)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr3  goto 31
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 9
+	expr10 : LP . expr0 RP  (34)
+	ntuple : LP . expr0 COMMA tuple_tail  (37)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 32
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 10
+	expr8 : IF . expr0 THEN expr0 ELSE expr0 FI  (26)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 33
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 11
+	expr10 : PROJ . LP INT COMMA INT RP expr9  (33)
+
+	LP  shift 34
+	.  error
+
+
+state 12
+	expr10 : LET . def IN expr0 END  (35)
+
+	DEF  shift 35
+	LOCAL  shift 36
+	.  error
+
+	def  goto 37
+	term_def  goto 38
+	simple_def  goto 39
+	local_def  goto 40
+
+
+state 13
+	function_abstraction : BACKSLASH . ID DOT expr10  (47)
+
+	ID  shift 41
+	.  error
+
+
+state 14
+	%entry% : '\001' main .  (49)
+
+	.  reduce 49
+
+
+state 15
+	main : expr0 . EOF  (1)
+	expr0 : expr0 . DISJ expr1  (3)
+
+	DISJ  shift 42
+	EOF  shift 43
+	.  error
+
+
+state 16
+	expr0 : expr1 .  (2)
+	expr1 : expr1 . CONJ expr2  (5)
+
+	CONJ  shift 44
+	DISJ  reduce 2
+	RP  reduce 2
+	THEN  reduce 2
+	ELSE  reduce 2
+	FI  reduce 2
+	COMMA  reduce 2
+	IN  reduce 2
+	END  reduce 2
+	SEMICOLON  reduce 2
+	PARALLEL  reduce 2
+	EOF  reduce 2
+
+
+state 17
+	expr1 : expr2 .  (4)
+
+	.  reduce 4
+
+
+state 18
+	expr2 : expr3 .  (6)
+	expr3 : expr3 . GT expr4  (9)
+	expr3 : expr3 . LT expr4  (10)
+	expr3 : expr3 . GT EQ expr4  (11)
+	expr3 : expr3 . LT EQ expr4  (12)
+	expr3 : expr3 . EQ expr4  (13)
+
+	EQ  shift 45
+	GT  shift 46
+	LT  shift 47
+	CONJ  reduce 6
+	DISJ  reduce 6
+	RP  reduce 6
+	THEN  reduce 6
+	ELSE  reduce 6
+	FI  reduce 6
+	COMMA  reduce 6
+	IN  reduce 6
+	END  reduce 6
+	SEMICOLON  reduce 6
+	PARALLEL  reduce 6
+	EOF  reduce 6
+
+
+state 19
+	expr3 : expr4 .  (8)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 8
+	DISJ  reduce 8
+	EQ  reduce 8
+	GT  reduce 8
+	LT  reduce 8
+	RP  reduce 8
+	THEN  reduce 8
+	ELSE  reduce 8
+	FI  reduce 8
+	COMMA  reduce 8
+	IN  reduce 8
+	END  reduce 8
+	SEMICOLON  reduce 8
+	PARALLEL  reduce 8
+	EOF  reduce 8
+
+
+state 20
+	expr4 : expr5 .  (14)
+	expr5 : expr5 . DIV expr6  (18)
+	expr5 : expr5 . REM expr6  (19)
+	expr5 : expr5 . TIMES expr6  (20)
+
+	TIMES  shift 50
+	DIV  shift 51
+	REM  shift 52
+	PLUS  reduce 14
+	MINUS  reduce 14
+	CONJ  reduce 14
+	DISJ  reduce 14
+	EQ  reduce 14
+	GT  reduce 14
+	LT  reduce 14
+	RP  reduce 14
+	THEN  reduce 14
+	ELSE  reduce 14
+	FI  reduce 14
+	COMMA  reduce 14
+	IN  reduce 14
+	END  reduce 14
+	SEMICOLON  reduce 14
+	PARALLEL  reduce 14
+	EOF  reduce 14
+
+
+state 21
+	expr5 : expr6 .  (17)
+
+	.  reduce 17
+
+
+state 22
+	expr6 : expr7 .  (21)
+
+	.  reduce 21
+
+
+state 23
+	expr7 : expr8 .  (23)
+
+	.  reduce 23
+
+
+state 24
+	expr8 : expr9 .  (25)
+
+	.  reduce 25
+
+
+25: shift/reduce conflict (shift 53, reduce 27) on LP
+state 25
+	expr9 : expr10 .  (27)
+	function_call : expr10 . LP expr0 RP  (48)
+
+	LP  shift 53
+	PLUS  reduce 27
+	MINUS  reduce 27
+	TIMES  reduce 27
+	DIV  reduce 27
+	REM  reduce 27
+	CONJ  reduce 27
+	DISJ  reduce 27
+	EQ  reduce 27
+	GT  reduce 27
+	LT  reduce 27
+	RP  reduce 27
+	THEN  reduce 27
+	ELSE  reduce 27
+	FI  reduce 27
+	COMMA  reduce 27
+	IN  reduce 27
+	END  reduce 27
+	SEMICOLON  reduce 27
+	PARALLEL  reduce 27
+	EOF  reduce 27
+
+
+state 26
+	expr9 : function_call .  (28)
+
+	.  reduce 28
+
+
+state 27
+	expr10 : ntuple .  (32)
+
+	.  reduce 32
+
+
+state 28
+	expr10 : function_abstraction .  (36)
+
+	.  reduce 36
+
+
+state 29
+	expr6 : ABS expr7 .  (22)
+
+	.  reduce 22
+
+
+state 30
+	expr7 : TILDA expr8 .  (24)
+
+	.  reduce 24
+
+
+state 31
+	expr2 : NOT expr3 .  (7)
+	expr3 : expr3 . GT expr4  (9)
+	expr3 : expr3 . LT expr4  (10)
+	expr3 : expr3 . GT EQ expr4  (11)
+	expr3 : expr3 . LT EQ expr4  (12)
+	expr3 : expr3 . EQ expr4  (13)
+
+	EQ  shift 45
+	GT  shift 46
+	LT  shift 47
+	CONJ  reduce 7
+	DISJ  reduce 7
+	RP  reduce 7
+	THEN  reduce 7
+	ELSE  reduce 7
+	FI  reduce 7
+	COMMA  reduce 7
+	IN  reduce 7
+	END  reduce 7
+	SEMICOLON  reduce 7
+	PARALLEL  reduce 7
+	EOF  reduce 7
+
+
+state 32
+	expr0 : expr0 . DISJ expr1  (3)
+	expr10 : LP expr0 . RP  (34)
+	ntuple : LP expr0 . COMMA tuple_tail  (37)
+
+	DISJ  shift 42
+	RP  shift 54
+	COMMA  shift 55
+	.  error
+
+
+state 33
+	expr0 : expr0 . DISJ expr1  (3)
+	expr8 : IF expr0 . THEN expr0 ELSE expr0 FI  (26)
+
+	DISJ  shift 42
+	THEN  shift 56
+	.  error
+
+
+state 34
+	expr10 : PROJ LP . INT COMMA INT RP expr9  (33)
+
+	INT  shift 57
+	.  error
+
+
+state 35
+	simple_def : DEF . ID EQ expr0  (45)
+
+	ID  shift 58
+	.  error
+
+
+state 36
+	local_def : LOCAL . def IN def END  (46)
+
+	DEF  shift 35
+	LOCAL  shift 36
+	.  error
+
+	def  goto 59
+	term_def  goto 38
+	simple_def  goto 39
+	local_def  goto 40
+
+
+state 37
+	expr10 : LET def . IN expr0 END  (35)
+	def : def . PARALLEL term_def  (41)
+	def : def . SEMICOLON term_def  (42)
+
+	IN  shift 60
+	SEMICOLON  shift 61
+	PARALLEL  shift 62
+	.  error
+
+
+state 38
+	def : term_def .  (40)
+
+	.  reduce 40
+
+
+state 39
+	term_def : simple_def .  (43)
+
+	.  reduce 43
+
+
+state 40
+	term_def : local_def .  (44)
+
+	.  reduce 44
+
+
+state 41
+	function_abstraction : BACKSLASH ID . DOT expr10  (47)
+
+	DOT  shift 63
+	.  error
+
+
+state 42
+	expr0 : expr0 DISJ . expr1  (3)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr1  goto 64
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 43
+	main : expr0 EOF .  (1)
+
+	.  reduce 1
+
+
+state 44
+	expr1 : expr1 CONJ . expr2  (5)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr2  goto 65
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 45
+	expr3 : expr3 EQ . expr4  (13)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr4  goto 66
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 46
+	expr3 : expr3 GT . expr4  (9)
+	expr3 : expr3 GT . EQ expr4  (11)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	EQ  shift 67
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr4  goto 68
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 47
+	expr3 : expr3 LT . expr4  (10)
+	expr3 : expr3 LT . EQ expr4  (12)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	EQ  shift 69
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr4  goto 70
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 48
+	expr4 : expr4 PLUS . expr5  (15)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr5  goto 71
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 49
+	expr4 : expr4 MINUS . expr5  (16)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr5  goto 72
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 50
+	expr5 : expr5 TIMES . expr6  (20)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr6  goto 73
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 51
+	expr5 : expr5 DIV . expr6  (18)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr6  goto 74
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 52
+	expr5 : expr5 REM . expr6  (19)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr6  goto 75
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 53
+	function_call : expr10 LP . expr0 RP  (48)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 76
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 54
+	expr10 : LP expr0 RP .  (34)
+
+	.  reduce 34
+
+
+state 55
+	ntuple : LP expr0 COMMA . tuple_tail  (37)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 77
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+	tuple_tail  goto 78
+
+
+state 56
+	expr8 : IF expr0 THEN . expr0 ELSE expr0 FI  (26)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 79
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 57
+	expr10 : PROJ LP INT . COMMA INT RP expr9  (33)
+
+	COMMA  shift 80
+	.  error
+
+
+state 58
+	simple_def : DEF ID . EQ expr0  (45)
+
+	EQ  shift 81
+	.  error
+
+
+state 59
+	def : def . PARALLEL term_def  (41)
+	def : def . SEMICOLON term_def  (42)
+	local_def : LOCAL def . IN def END  (46)
+
+	IN  shift 82
+	SEMICOLON  shift 61
+	PARALLEL  shift 62
+	.  error
+
+
+state 60
+	expr10 : LET def IN . expr0 END  (35)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 83
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 61
+	def : def SEMICOLON . term_def  (42)
+
+	DEF  shift 35
+	LOCAL  shift 36
+	.  error
+
+	term_def  goto 84
+	simple_def  goto 39
+	local_def  goto 40
+
+
+state 62
+	def : def PARALLEL . term_def  (41)
+
+	DEF  shift 35
+	LOCAL  shift 36
+	.  error
+
+	term_def  goto 85
+	simple_def  goto 39
+	local_def  goto 40
+
+
+state 63
+	function_abstraction : BACKSLASH ID DOT . expr10  (47)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	LP  shift 9
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr10  goto 86
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 64
+	expr0 : expr0 DISJ expr1 .  (3)
+	expr1 : expr1 . CONJ expr2  (5)
+
+	CONJ  shift 44
+	DISJ  reduce 3
+	RP  reduce 3
+	THEN  reduce 3
+	ELSE  reduce 3
+	FI  reduce 3
+	COMMA  reduce 3
+	IN  reduce 3
+	END  reduce 3
+	SEMICOLON  reduce 3
+	PARALLEL  reduce 3
+	EOF  reduce 3
+
+
+state 65
+	expr1 : expr1 CONJ expr2 .  (5)
+
+	.  reduce 5
+
+
+state 66
+	expr3 : expr3 EQ expr4 .  (13)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 13
+	DISJ  reduce 13
+	EQ  reduce 13
+	GT  reduce 13
+	LT  reduce 13
+	RP  reduce 13
+	THEN  reduce 13
+	ELSE  reduce 13
+	FI  reduce 13
+	COMMA  reduce 13
+	IN  reduce 13
+	END  reduce 13
+	SEMICOLON  reduce 13
+	PARALLEL  reduce 13
+	EOF  reduce 13
+
+
+state 67
+	expr3 : expr3 GT EQ . expr4  (11)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr4  goto 87
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 68
+	expr3 : expr3 GT expr4 .  (9)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 9
+	DISJ  reduce 9
+	EQ  reduce 9
+	GT  reduce 9
+	LT  reduce 9
+	RP  reduce 9
+	THEN  reduce 9
+	ELSE  reduce 9
+	FI  reduce 9
+	COMMA  reduce 9
+	IN  reduce 9
+	END  reduce 9
+	SEMICOLON  reduce 9
+	PARALLEL  reduce 9
+	EOF  reduce 9
+
+
+state 69
+	expr3 : expr3 LT EQ . expr4  (12)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr4  goto 88
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 70
+	expr3 : expr3 LT expr4 .  (10)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 10
+	DISJ  reduce 10
+	EQ  reduce 10
+	GT  reduce 10
+	LT  reduce 10
+	RP  reduce 10
+	THEN  reduce 10
+	ELSE  reduce 10
+	FI  reduce 10
+	COMMA  reduce 10
+	IN  reduce 10
+	END  reduce 10
+	SEMICOLON  reduce 10
+	PARALLEL  reduce 10
+	EOF  reduce 10
+
+
+state 71
+	expr4 : expr4 PLUS expr5 .  (15)
+	expr5 : expr5 . DIV expr6  (18)
+	expr5 : expr5 . REM expr6  (19)
+	expr5 : expr5 . TIMES expr6  (20)
+
+	TIMES  shift 50
+	DIV  shift 51
+	REM  shift 52
+	PLUS  reduce 15
+	MINUS  reduce 15
+	CONJ  reduce 15
+	DISJ  reduce 15
+	EQ  reduce 15
+	GT  reduce 15
+	LT  reduce 15
+	RP  reduce 15
+	THEN  reduce 15
+	ELSE  reduce 15
+	FI  reduce 15
+	COMMA  reduce 15
+	IN  reduce 15
+	END  reduce 15
+	SEMICOLON  reduce 15
+	PARALLEL  reduce 15
+	EOF  reduce 15
+
+
+state 72
+	expr4 : expr4 MINUS expr5 .  (16)
+	expr5 : expr5 . DIV expr6  (18)
+	expr5 : expr5 . REM expr6  (19)
+	expr5 : expr5 . TIMES expr6  (20)
+
+	TIMES  shift 50
+	DIV  shift 51
+	REM  shift 52
+	PLUS  reduce 16
+	MINUS  reduce 16
+	CONJ  reduce 16
+	DISJ  reduce 16
+	EQ  reduce 16
+	GT  reduce 16
+	LT  reduce 16
+	RP  reduce 16
+	THEN  reduce 16
+	ELSE  reduce 16
+	FI  reduce 16
+	COMMA  reduce 16
+	IN  reduce 16
+	END  reduce 16
+	SEMICOLON  reduce 16
+	PARALLEL  reduce 16
+	EOF  reduce 16
+
+
+state 73
+	expr5 : expr5 TIMES expr6 .  (20)
+
+	.  reduce 20
+
+
+state 74
+	expr5 : expr5 DIV expr6 .  (18)
+
+	.  reduce 18
+
+
+state 75
+	expr5 : expr5 REM expr6 .  (19)
+
+	.  reduce 19
+
+
+state 76
+	expr0 : expr0 . DISJ expr1  (3)
+	function_call : expr10 LP expr0 . RP  (48)
+
+	DISJ  shift 42
+	RP  shift 89
+	.  error
+
+
+state 77
+	expr0 : expr0 . DISJ expr1  (3)
+	tuple_tail : expr0 . RP  (38)
+	tuple_tail : expr0 . COMMA tuple_tail  (39)
+
+	DISJ  shift 42
+	RP  shift 90
+	COMMA  shift 91
+	.  error
+
+
+state 78
+	ntuple : LP expr0 COMMA tuple_tail .  (37)
+
+	.  reduce 37
+
+
+state 79
+	expr0 : expr0 . DISJ expr1  (3)
+	expr8 : IF expr0 THEN expr0 . ELSE expr0 FI  (26)
+
+	DISJ  shift 42
+	ELSE  shift 92
+	.  error
+
+
+state 80
+	expr10 : PROJ LP INT COMMA . INT RP expr9  (33)
+
+	INT  shift 93
+	.  error
+
+
+state 81
+	simple_def : DEF ID EQ . expr0  (45)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 94
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 82
+	local_def : LOCAL def IN . def END  (46)
+
+	DEF  shift 35
+	LOCAL  shift 36
+	.  error
+
+	def  goto 95
+	term_def  goto 38
+	simple_def  goto 39
+	local_def  goto 40
+
+
+state 83
+	expr0 : expr0 . DISJ expr1  (3)
+	expr10 : LET def IN expr0 . END  (35)
+
+	DISJ  shift 42
+	END  shift 96
+	.  error
+
+
+state 84
+	def : def SEMICOLON term_def .  (42)
+
+	.  reduce 42
+
+
+state 85
+	def : def PARALLEL term_def .  (41)
+
+	.  reduce 41
+
+
+state 86
+	function_abstraction : BACKSLASH ID DOT expr10 .  (47)
+
+	.  reduce 47
+
+
+state 87
+	expr3 : expr3 GT EQ expr4 .  (11)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 11
+	DISJ  reduce 11
+	EQ  reduce 11
+	GT  reduce 11
+	LT  reduce 11
+	RP  reduce 11
+	THEN  reduce 11
+	ELSE  reduce 11
+	FI  reduce 11
+	COMMA  reduce 11
+	IN  reduce 11
+	END  reduce 11
+	SEMICOLON  reduce 11
+	PARALLEL  reduce 11
+	EOF  reduce 11
+
+
+state 88
+	expr3 : expr3 LT EQ expr4 .  (12)
+	expr4 : expr4 . PLUS expr5  (15)
+	expr4 : expr4 . MINUS expr5  (16)
+
+	PLUS  shift 48
+	MINUS  shift 49
+	CONJ  reduce 12
+	DISJ  reduce 12
+	EQ  reduce 12
+	GT  reduce 12
+	LT  reduce 12
+	RP  reduce 12
+	THEN  reduce 12
+	ELSE  reduce 12
+	FI  reduce 12
+	COMMA  reduce 12
+	IN  reduce 12
+	END  reduce 12
+	SEMICOLON  reduce 12
+	PARALLEL  reduce 12
+	EOF  reduce 12
+
+
+state 89
+	function_call : expr10 LP expr0 RP .  (48)
+
+	.  reduce 48
+
+
+state 90
+	tuple_tail : expr0 RP .  (38)
+
+	.  reduce 38
+
+
+state 91
+	tuple_tail : expr0 COMMA . tuple_tail  (39)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 77
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+	tuple_tail  goto 97
+
+
+state 92
+	expr8 : IF expr0 THEN expr0 ELSE . expr0 FI  (26)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	ABS  shift 6
+	TILDA  shift 7
+	NOT  shift 8
+	LP  shift 9
+	IF  shift 10
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr0  goto 98
+	expr1  goto 16
+	expr2  goto 17
+	expr3  goto 18
+	expr4  goto 19
+	expr5  goto 20
+	expr6  goto 21
+	expr7  goto 22
+	expr8  goto 23
+	expr9  goto 24
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 93
+	expr10 : PROJ LP INT COMMA INT . RP expr9  (33)
+
+	RP  shift 99
+	.  error
+
+
+state 94
+	expr0 : expr0 . DISJ expr1  (3)
+	simple_def : DEF ID EQ expr0 .  (45)
+
+	DISJ  shift 42
+	IN  reduce 45
+	END  reduce 45
+	SEMICOLON  reduce 45
+	PARALLEL  reduce 45
+
+
+state 95
+	def : def . PARALLEL term_def  (41)
+	def : def . SEMICOLON term_def  (42)
+	local_def : LOCAL def IN def . END  (46)
+
+	END  shift 100
+	SEMICOLON  shift 61
+	PARALLEL  shift 62
+	.  error
+
+
+state 96
+	expr10 : LET def IN expr0 END .  (35)
+
+	.  reduce 35
+
+
+state 97
+	tuple_tail : expr0 COMMA tuple_tail .  (39)
+
+	.  reduce 39
+
+
+state 98
+	expr0 : expr0 . DISJ expr1  (3)
+	expr8 : IF expr0 THEN expr0 ELSE expr0 . FI  (26)
+
+	DISJ  shift 42
+	FI  shift 101
+	.  error
+
+
+state 99
+	expr10 : PROJ LP INT COMMA INT RP . expr9  (33)
+
+	INT  shift 3
+	BOOL  shift 4
+	ID  shift 5
+	LP  shift 9
+	PROJ  shift 11
+	LET  shift 12
+	BACKSLASH  shift 13
+	.  error
+
+	expr9  goto 102
+	expr10  goto 25
+	function_call  goto 26
+	ntuple  goto 27
+	function_abstraction  goto 28
+
+
+state 100
+	local_def : LOCAL def IN def END .  (46)
+
+	.  reduce 46
+
+
+state 101
+	expr8 : IF expr0 THEN expr0 ELSE expr0 FI .  (26)
+
+	.  reduce 26
+
+
+state 102
+	expr10 : PROJ LP INT COMMA INT RP expr9 .  (33)
+
+	.  reduce 33
+
+
+State 25 contains 1 shift/reduce conflict.
+
+
+37 terminals, 22 nonterminals
+50 grammar rules, 103 states
