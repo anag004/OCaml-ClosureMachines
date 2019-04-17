@@ -4,47 +4,47 @@ ocamldep.opt -modules krivine.mli > krivine.mli.depends
 # Target: krivine.cmi, tags: { byte, compile, extension:mli, file:krivine.mli, interf, ocaml, quiet }
 ocamlc.opt -c -o krivine.cmi krivine.mli
 # Target: krivine.ml.depends, tags: { extension:ml, file:krivine.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules krivine.ml > krivine.ml.depends # cached
+ocamldep.opt -modules krivine.ml > krivine.ml.depends
 # Target: krivine.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:krivine.cmo, file:krivine.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o krivine.cmo krivine.ml
 + ocamlc.opt -c -o krivine.cmo krivine.ml
-File "krivine.ml", line 82, characters 6-73:
+File "krivine.ml", line 83, characters 6-73:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 VClos (_, _)
-File "krivine.ml", line 102, characters 0-119:
+File "krivine.ml", line 104, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 109, characters 0-119:
+File "krivine.ml", line 111, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 115, characters 0-119:
+File "krivine.ml", line 117, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 121, characters 0-119:
+File "krivine.ml", line 123, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 127, characters 0-119:
+File "krivine.ml", line 129, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 133, characters 0-119:
+File "krivine.ml", line 135, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 139, characters 0-119:
+File "krivine.ml", line 141, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 145, characters 0-119:
+File "krivine.ml", line 147, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)
-File "krivine.ml", line 151, characters 0-119:
+File "krivine.ml", line 153, characters 0-119:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 FuncVal (_, _)

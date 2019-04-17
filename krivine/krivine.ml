@@ -5,6 +5,7 @@ type exptype = Tint | Tunit | Tbool | Ttuple of (exptype list) | Tfunc of (expty
 (* abstract syntax *)
 type exptree =
     Var of string (* variables starting with a Capital letter, represented as alphanumeric strings with underscores (_) and apostrophes (') *)
+  | VarRec of string
   | N of int      (* Integer constant *)
   | B of bool     (* Boolean constant *)
   (* binary operators on integers *)
@@ -76,11 +77,12 @@ let rec krivine e s =
       | APP(c) :: s_rem -> krivine (Clos(et, (augment t x c))) s_rem
       | _ -> raise (StackError "Incorrent stack_token for VClos of type func")
     )
-  | Clos(Var(x), t) -> (
+  | Clos(VarRec(x), t) -> (
       let el = (lookupTable x t)
       in
       match el with Clos(c, t1) -> krivine (Clos(c, (augment t1 x el))) s
     )
+  | Clos(Var(x), t) -> krivine (lookupTable x t) s
   | Clos(N(x), t) -> krivine (VClos(NumVal(x), t)) s
   | Clos(B(x), t) -> krivine (VClos(BoolVal(x), t)) s
   | Clos(Add(e1, e2), t) -> krivine (Clos(e2, t)) (ADD(Clos(e1, t)) :: s)

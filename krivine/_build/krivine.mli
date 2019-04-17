@@ -5,6 +5,7 @@ type exptype = Tint | Tunit | Tbool | Ttuple of (exptype list) | Tfunc of (expty
 (* abstract syntax *)
 type exptree =
     Var of string (* variables starting with a Capital letter, represented as alphanumeric strings with underscores (_) and apostrophes (') *)
+  | VarRec of string
   | N of int      (* Integer constant *)
   | B of bool     (* Boolean constant *)
   (* binary operators on integers *)
