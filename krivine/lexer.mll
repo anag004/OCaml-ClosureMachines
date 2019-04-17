@@ -7,7 +7,7 @@
 let whitespace = [' ' '\t']+
 let digits = ['0'-'9']                                        (* All single digits *)
 let nzdigits = ['1'-'9']                                      (* Non-zero digits *)
-let intConstant = ('0' | nzdigits digits*)                (* Regex for non-negative integers  *)
+let intConstant = ('0' | nzdigits digits*)                    (* Regex for non-negative integers  *)
 
 (* ====================== Definition of matching strings for operators ===================== *)
 let trueSymbol = 'T'
@@ -21,7 +21,7 @@ let subOperator = '-'
 let tildeOperatror = '~'
 let multOperator = "*"
 let modOperator = "mod"
-let expOperator = '^'
+let recKeyword = "rec"
 let leftParan = '('
 let rightParan = ')'
 let notOperator = "not"
@@ -51,7 +51,6 @@ let backslashSymbol = "\\"
 let dotSymbol = "."
 let defKeyword = "def"
 let parallelSymbol = "||"
-let localKeyword = "local"
 let intType = "Tint"
 let boolType = "Tbool"
 let unitType = "Tunit"
@@ -68,6 +67,7 @@ rule read = parse
 |  multOperator         {TIMES}
 |  divOperator          {DIV}
 |  modOperator          {REM}
+|  recKeyword           {REC}
 |  leftParan            {LP}
 |  rightParan           {RP}
 |  notOperator          {NOT}
@@ -95,7 +95,6 @@ rule read = parse
 |  defKeyword           {DEF}
 |  semicolonSymbol      {SEMICOLON}
 |  parallelSymbol       {PARALLEL}
-|  localKeyword         {LOCAL}
 |  eof                  {EOF}
 |  colonSymbol          {COLON}
 | _                     {raise Not_implemented}

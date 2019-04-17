@@ -44,7 +44,6 @@ and definition =
   Simple of string * exptree * exptype
 | Sequence of (definition list)
 | Parallel of (definition list)
-| Local of definition * definition
 
 
 type value = NumVal of int | BoolVal of bool | FuncVal of string * exptree | TupleVal of (int * exptree list)

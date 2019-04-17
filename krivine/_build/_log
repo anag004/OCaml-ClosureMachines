@@ -7,4 +7,28 @@ ocamlc.opt -c -o krivine.cmi krivine.mli # cached
 ocamldep.opt -modules krivine.ml > krivine.ml.depends # cached
 # Target: krivine.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:krivine.cmo, file:krivine.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o krivine.cmo krivine.ml # cached
+# Target: typechecker.mli.depends, tags: { extension:mli, file:typechecker.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.mli > typechecker.mli.depends # cached
+# Target: typechecker.cmi, tags: { byte, compile, extension:mli, file:typechecker.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmi typechecker.mli # cached
+# Target: typechecker.ml.depends, tags: { extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.ml > typechecker.ml.depends # cached
+# Target: typechecker.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmo typechecker.ml # cached
+# Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
+ocamlyacc parser.mly
+# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules parser.mli > parser.mli.depends
+# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o parser.cmi parser.mli
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules parser.ml > parser.ml.depends
+# Target: parser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o parser.cmo parser.ml
+# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
+ocamllex.opt -q lexer.mll
+# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules lexer.ml > lexer.ml.depends
+# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o lexer.cmo lexer.ml
 # Compilation successful.
