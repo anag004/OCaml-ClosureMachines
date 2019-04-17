@@ -37,12 +37,16 @@ type exptree =
   (* creating n-tuples (n >= 0) *)
   | Tuple of int * (exptree list)
   | Project of (int*int) * exptree   (* Proj((i,n), e)  0 < i <= n *)
+  | Let of definition * exptree
   | FunctionAbstraction of string * exptree * exptype
   | FunctionCall of exptree * exptree
+and definition =
+  Simple of string * exptree * exptype
+
 
 type value = NumVal of int | BoolVal of bool | FuncVal of string * exptree | TupleVal of (int * exptree list)
 
-type closure = Clos of exptree * table | VClos of value * table
+type closure = Clos of exptree * table | VClos of value * table | DefClos of definition * table | VDefClos of table * table
 and table = (string * closure) list
 
 type stack_token =
@@ -53,6 +57,7 @@ type stack_token =
 | IFTE of closure * closure
 | PROJ of int * int
 | APP of closure
+| DEF of closure
 
 exception StackError of string
 exception TableError
@@ -153,7 +158,19 @@ let rec krivine e s =
   | Clos(Project((a, b), e1), t) -> krivine (Clos(e1, t)) (PROJ(a, b) :: s)
   | Clos(FunctionAbstraction(x, e1, tau), t) -> krivine (VClos(FuncVal(x, e1), t)) s
   | Clos(FunctionCall(e1, e2), t) -> krivine (Clos(e1, t)) (APP(Clos(e2, t)) :: s)
-
+  (* Evaluating definitions =========== *)
+  | Clos(Let(d, e1), t) -> krivine (DefClos(d, t)) (DEF(Clos(e1, t)) :: s)
+  | DefClos(Simple(x, e1, tau), t) -> krivine (VDefClos([x, Clos(e1, t)], t)) s
+  | VDefClos(t1, t2) -> (
+      let rec aux a b =
+        match a with
+          [] -> b
+        | (x, y) :: a_rem -> aux a_rem (augment b x y)
+      in
+        match s with
+          DEF(Clos(e, t)) :: s_rem -> krivine (Clos(e, (aux t1 t2))) s_rem
+        | _ -> raise (StackError "Did not find the defintion opcode after defintion")
+    )
 (* =================== Tests ===================== *)
 (* Variable/Integer conversion *)
 let t = [("X", Clos(N(1), []))] ;;
@@ -213,6 +230,13 @@ match krivine e [] with
 
 (* Tuples -- Call by Name *)
 let e = Clos(Project((2, 3), Tuple(3, [Var "Y"; N(2); N(3)])), []) ;;
+match krivine e [] with
+  NumVal(x) -> print_endline (string_of_int x)
+| BoolVal(x) -> print_endline (string_of_bool x) ;;
+
+(* Definition - Call by name *)
+let fact_prog = FunctionAbstraction("X", IfThenElse(Equals(Var("X"), N(0)), N(1), Mult(Var("X"), FunctionCall(VarRec("Y"), Sub(Var("X"), N(1))))), Tint) ;;
+let e = Clos(Let(Simple("Y", fact_prog, Tint) ,FunctionCall(VarRec "Y", N(5))), []) ;;
 match krivine e [] with
   NumVal(x) -> print_endline (string_of_int x)
 | BoolVal(x) -> print_endline (string_of_bool x) ;;
