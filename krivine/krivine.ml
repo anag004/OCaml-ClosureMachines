@@ -60,7 +60,7 @@ type stack_token =
 | IFTE of closure * closure
 | PROJ of int * int
 | APP of closure
-| DEF of closure | SEQDEF of closure | PARDEF of closure * table
+| DEF of closure | SEQDEF of closure | PARDEF of closure
 
 exception StackError of string
 exception TableError
@@ -170,11 +170,14 @@ let rec krivine e s =
   | Clos(Let(d, e1), t) -> krivine (DefClos(d, t)) (DEF(Clos(e1, t)) :: s)
   | DefClos(Simple(x, e1, tau), t) -> krivine (VDefClos(augment t x (Clos(e1, t)))) s
   | DefClos(Sequence([d1; d2]), t) -> krivine (DefClos(d1, t)) (SEQDEF(DefClos(d2, t)) :: s)
+  | DefClos(Parallel([d1; d2]), t) -> krivine (DefClos(d1, t)) (PARDEF(DefClos(d2, t)) :: s)
   | VDefClos(t1) -> (
       match s with
         DEF(Clos(e, t)) :: s_rem -> krivine (Clos(e, t1)) s_rem
       | SEQDEF(DefClos(d2, t)) :: s_rem -> krivine (DefClos(d2, t1)) (SEQDEF(VDefClos(t1)) :: s_rem)
       | SEQDEF(VDefClos(t)) :: s_rem -> krivine (VDefClos(t1)) s_rem
+      | PARDEF(DefClos(d2, t)) :: s_rem -> krivine (DefClos(d2, t)) (PARDEF(VDefClos(t1)) :: s_rem)
+      | PARDEF(VDefClos(t)) :: s_rem -> krivine (VDefClos(join t t1)) s_rem
       | _ -> raise (StackError "Did not find the defintion opcode after defintion")
     )
 (* =================== Tests ===================== *)
@@ -250,7 +253,15 @@ match krivine e [] with
 
 print_endline "Factorial using sequential definitions"
 (* Sequential definitions *)
-let d = Sequence([Simple("Y", fact_prog, Tint); Simple("Z", N(5), Tint)]) ;;
+let d = Sequence([Simple("Y", fact_prog, Tint); Simple("Z", FunctionCall(VarRec "Y", N(3)), Tint)]) ;;
+let e = Clos(Let(d, FunctionCall(VarRec "Y", Var "Z")), []) ;;
+match krivine e [] with
+  NumVal(x) -> print_endline (string_of_int x)
+| BoolVal(x) -> print_endline (string_of_bool x) ;;
+
+print_endline "Factorial using parallel definitions"
+(* Sequential definitions *)
+let d = Parallel([Simple("Y", fact_prog, Tint); Simple("Z", FunctionCall(VarRec "Y", N(3)), Tint)]) ;;
 let e = Clos(Let(d, FunctionCall(VarRec "Y", Var "Z")), []) ;;
 match krivine e [] with
   NumVal(x) -> print_endline (string_of_int x)
