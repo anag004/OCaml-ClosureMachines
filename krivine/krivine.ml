@@ -42,11 +42,14 @@ type exptree =
   | FunctionCall of exptree * exptree
 and definition =
   Simple of string * exptree * exptype
+| Sequence of (definition list)
+| Parallel of (definition list)
+| Local of definition * definition
 
 
 type value = NumVal of int | BoolVal of bool | FuncVal of string * exptree | TupleVal of (int * exptree list)
 
-type closure = Clos of exptree * table | VClos of value * table | DefClos of definition * table | VDefClos of table * table
+type closure = Clos of exptree * table | VClos of value * table | DefClos of definition * table | VDefClos of table
 and table = (string * closure) list
 
 type stack_token =
@@ -57,7 +60,7 @@ type stack_token =
 | IFTE of closure * closure
 | PROJ of int * int
 | APP of closure
-| DEF of closure
+| DEF of closure | SEQDEF of closure | PARDEF of closure * table
 
 exception StackError of string
 exception TableError
@@ -70,6 +73,11 @@ let rec lookupTable s t = match t with
 let rec augment t s x = match t with
   [] -> [(s, x)]
 | (s1, y) :: ts -> if s = s1 then (s, x) :: ts else (s1, y) :: (augment ts s x)
+
+let rec join t1 t2 =
+  match t1 with
+    [] -> t2
+  | (s, x) :: t1_rem -> join t1_rem (augment t2 s x)
 
 let rec krivine e s =
   match e with
@@ -158,18 +166,16 @@ let rec krivine e s =
   | Clos(Project((a, b), e1), t) -> krivine (Clos(e1, t)) (PROJ(a, b) :: s)
   | Clos(FunctionAbstraction(x, e1, tau), t) -> krivine (VClos(FuncVal(x, e1), t)) s
   | Clos(FunctionCall(e1, e2), t) -> krivine (Clos(e1, t)) (APP(Clos(e2, t)) :: s)
-  (* Evaluating definitions =========== *)
+  (* ============ Evaluating definitions =========== *)
   | Clos(Let(d, e1), t) -> krivine (DefClos(d, t)) (DEF(Clos(e1, t)) :: s)
-  | DefClos(Simple(x, e1, tau), t) -> krivine (VDefClos([x, Clos(e1, t)], t)) s
-  | VDefClos(t1, t2) -> (
-      let rec aux a b =
-        match a with
-          [] -> b
-        | (x, y) :: a_rem -> aux a_rem (augment b x y)
-      in
-        match s with
-          DEF(Clos(e, t)) :: s_rem -> krivine (Clos(e, (aux t1 t2))) s_rem
-        | _ -> raise (StackError "Did not find the defintion opcode after defintion")
+  | DefClos(Simple(x, e1, tau), t) -> krivine (VDefClos(augment t x (Clos(e1, t)))) s
+  | DefClos(Sequence([d1; d2]), t) -> krivine (DefClos(d1, t)) (SEQDEF(DefClos(d2, t)) :: s)
+  | VDefClos(t1) -> (
+      match s with
+        DEF(Clos(e, t)) :: s_rem -> krivine (Clos(e, t1)) s_rem
+      | SEQDEF(DefClos(d2, t)) :: s_rem -> krivine (DefClos(d2, t1)) (SEQDEF(VDefClos(t1)) :: s_rem)
+      | SEQDEF(VDefClos(t)) :: s_rem -> krivine (VDefClos(t1)) s_rem
+      | _ -> raise (StackError "Did not find the defintion opcode after defintion")
     )
 (* =================== Tests ===================== *)
 (* Variable/Integer conversion *)
@@ -234,9 +240,18 @@ match krivine e [] with
   NumVal(x) -> print_endline (string_of_int x)
 | BoolVal(x) -> print_endline (string_of_bool x) ;;
 
+print_endline "Factorial using simple definition"
 (* Definition - Call by name *)
 let fact_prog = FunctionAbstraction("X", IfThenElse(Equals(Var("X"), N(0)), N(1), Mult(Var("X"), FunctionCall(VarRec("Y"), Sub(Var("X"), N(1))))), Tint) ;;
-let e = Clos(Let(Simple("Y", fact_prog, Tint) ,FunctionCall(VarRec "Y", N(5))), []) ;;
+let e = Clos(Let(Simple("Y", fact_prog, Tint) ,FunctionCall(VarRec "Y", N(0))), []) ;;
+match krivine e [] with
+  NumVal(x) -> print_endline (string_of_int x)
+| BoolVal(x) -> print_endline (string_of_bool x) ;;
+
+print_endline "Factorial using sequential definitions"
+(* Sequential definitions *)
+let d = Sequence([Simple("Y", fact_prog, Tint); Simple("Z", N(5), Tint)]) ;;
+let e = Clos(Let(d, FunctionCall(VarRec "Y", Var "Z")), []) ;;
 match krivine e [] with
   NumVal(x) -> print_endline (string_of_int x)
 | BoolVal(x) -> print_endline (string_of_bool x) ;;
