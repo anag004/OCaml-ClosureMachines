@@ -7,16 +7,27 @@ type exptree =
     Var of string (* variables starting with a Capital letter, represented as alphanumeric strings with underscores (_) and apostrophes (') *)
   | N of int      (* Integer constant *)
   | B of bool     (* Boolean constant *)
+  (* unary operators on integers *)
+  | Abs of exptree                   (* abs *)
+  | Negative of exptree              (* unary minus ~ *)
   (* binary operators on integers *)
   | Add of exptree * exptree         (* Addition + *)
   | Mult of exptree * exptree        (* Multiplication * *)
   | Sub of exptree * exptree
+  | Div of exptree * exptree         (* div *)
+  | Rem of exptree * exptree         (* mod *)
+  (* unary operators on booleans *)
+  | Not of exptree
   (* binary operators on booleans *)
   | Conjunction of exptree * exptree (* conjunction /\ *)
   | Disjunction of exptree * exptree (* binary operators on booleans \/ *)
   (* comparison operations on integers *)
   | Cmp of exptree
   | Equals of exptree * exptree
+  | GreaterTE of exptree * exptree   (* >= *)
+  | LessTE of exptree * exptree      (* <= *)
+  | GreaterT of exptree * exptree    (* > *)
+  | LessT of exptree * exptree       (* < *)
   (* expressions using parenthesis *)
   | InParen of exptree               (* ( ) *)
   (* a conditional expression *)
@@ -25,7 +36,11 @@ type exptree =
   | FunctionCall of exptree * exptree
 
 (* opcodes of the SECD (in the same sequence as above) *)
-type opcode = VAR of string | NCONST of int | BCONST of bool | PLUS | MINUS | MULT | CONJ | DISJ | CMP | EQUALS | PAREN | IFTE of (opcode list) * (opcode list)
+type opcode = VAR of string | NCONST of int | BCONST of bool
+| NEG | ABS | PLUS | MINUS | MULT | DIV | REM
+| NOT | CONJ | DISJ
+| CMP | EQUALS | GT | LT | GEQ | LEQ
+| PAREN | IFTE of (opcode list) * (opcode list)
 | FABS of string * (opcode list) | FCALL of (opcode list) * (opcode list) | APP | RET
 
 (* The type of value returned by the definitional interpreter. *)
@@ -40,13 +55,22 @@ let rec compile e = match e with
   Var(s) -> [VAR(s)]
 | N(n) -> [NCONST(n)]
 | B(b) -> [BCONST(b)]
+| Negative(e1) -> (compile e1) @ [NEG]
+| Abs(e1) -> (compile e1) @ [ABS]
 | Add(e1, e2) -> (compile e1) @ (compile e2) @ [PLUS]
 | Sub(e1, e2) -> (compile e2) @ (compile e1) @ [MINUS]
 | Mult(e1, e2) -> (compile e1) @ (compile e2) @ [MULT]
+| Div(e1, e2) -> (compile e2) @ (compile e1) @ [DIV]
+| Rem(e1, e2) -> (compile e2) @ (compile e1) @ [REM]
+| Not(e1) -> (compile e1) @ [NOT]
 | Disjunction(e1, e2) -> (compile e1) @ (compile e2) @ [DISJ]
 | Conjunction(e1, e2) -> (compile e1) @ (compile e2) @ [CONJ]
 | Cmp(es) -> (compile es) @ [CMP]
 | Equals(e1, e2) -> (compile e1) @ (compile e2) @ [EQUALS]
+| GreaterT(e1, e2) -> (compile e2) @ (compile e1) @ [GT]
+| GreaterTE(e1, e2) -> (compile e2) @ (compile e1) @ [GEQ]
+| LessT(e1, e2) -> (compile e2) @ (compile e1) @ [LT]
+| LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
 | InParen(es) -> (compile es) @ [CMP]
 | IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
 | FunctionAbstraction(s, es, t) -> [FABS(s, (compile es) @ [RET])]
@@ -78,6 +102,16 @@ let rec secd s e c d = match c with
     in
     match el with VClose(v, t) -> secd (VClose(v, (augment t x el)) :: s) e c_dash d
   )
+| NEG :: c_dash -> (
+    match s with
+      VClose(NumVal(n), t) :: s_dash -> secd (VClose(NumVal(-n), t) :: s) e c_dash d
+    | _ -> raise (StackError "Negative does not find an integer on the stack")
+  )
+| ABS :: c_dash -> (
+    match s with
+      VClose(NumVal(n), t) :: s_dash -> secd (VClose(NumVal(abs n), t) :: s) e c_dash d
+    | _ -> raise (StackError "Abs does not find an integer on the stack")
+  )
 | PLUS :: c_dash -> (
     match s with
       VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
@@ -98,6 +132,27 @@ let rec secd s e c d = match c with
           secd (VClose(NumVal(n1 * n2), e) :: s_dash) e c_dash d
         )
     | _ -> raise (StackError "Multiplication does not find two numbers on the stack")
+  )
+| DIV :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(NumVal(n1 / n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Division does not find two numbers on the stack")
+  )
+| REM :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(NumVal(n1 - n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Remainder does not find two numbers on the stack")
+  )
+| NOT :: c_dash -> (
+    match s with
+      VClose(BoolVal(b), t) :: s_dash -> (
+        secd (VClose(BoolVal(not b), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Not does not find a number on the stack")
   )
 | DISJ :: c_dash -> (
     match s with
@@ -120,6 +175,34 @@ let rec secd s e c d = match c with
         )
     | _ -> raise (StackError "Compare does not find a number on the stack")
   )
+| GT :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 > n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Greater than does not find two numbers on the stack")
+  )
+| GEQ :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 >= n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Greater than or equal to does not find two numbers on the stack")
+  )
+| LT :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 < n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Less than does not find two numbers on the stack")
+  )
+| LEQ :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 <= n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Less than or equal to does not find two numbers on the stack")
+  )
 | EQUALS :: c_dash -> (
     match s with
       VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
@@ -127,6 +210,7 @@ let rec secd s e c d = match c with
         )
     | _ -> raise (StackError "Equals does not find two numbers on the stack")
   )
+
 | PAREN :: c_dash -> secd s e c d
 | IFTE(c1, c2) :: c_dash -> (
     match s with
