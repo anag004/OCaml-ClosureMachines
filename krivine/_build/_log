@@ -1,34 +1,116 @@
 ### Starting build.
 # Target: krivine.mli.depends, tags: { extension:mli, file:krivine.mli, ocaml, ocamldep, quiet }
-ocamldep.opt -modules krivine.mli > krivine.mli.depends # cached
+ocamldep.opt -modules krivine.mli > krivine.mli.depends
 # Target: krivine.cmi, tags: { byte, compile, extension:mli, file:krivine.mli, interf, ocaml, quiet }
-ocamlc.opt -c -o krivine.cmi krivine.mli # cached
+ocamlc.opt -c -o krivine.cmi krivine.mli
 # Target: krivine.ml.depends, tags: { extension:ml, file:krivine.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules krivine.ml > krivine.ml.depends # cached
+ocamldep.opt -modules krivine.ml > krivine.ml.depends
 # Target: krivine.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:krivine.cmo, file:krivine.ml, implem, ocaml, quiet }
-ocamlc.opt -c -o krivine.cmo krivine.ml # cached
-# Target: typechecker.mli.depends, tags: { extension:mli, file:typechecker.mli, ocaml, ocamldep, quiet }
-ocamldep.opt -modules typechecker.mli > typechecker.mli.depends # cached
-# Target: typechecker.cmi, tags: { byte, compile, extension:mli, file:typechecker.mli, interf, ocaml, quiet }
-ocamlc.opt -c -o typechecker.cmi typechecker.mli # cached
-# Target: typechecker.ml.depends, tags: { extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules typechecker.ml > typechecker.ml.depends # cached
-# Target: typechecker.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet }
-ocamlc.opt -c -o typechecker.cmo typechecker.ml # cached
+ocamlc.opt -c -o krivine.cmo krivine.ml
++ ocamlc.opt -c -o krivine.cmo krivine.ml
+File "krivine.ml", line 132, characters 33-271:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(ABS|NEG|NOT|CMP|DIV _|REM _|ADD _|MULT _|SUB _|CONJ _|DISJ _|EQ _|GT _|
+GEQ _|LT _|LEQ _|IFTE (_, _)|APP _|DEF _|SEQDEF _|PARDEF _)::_
+File "krivine.ml", line 141, characters 6-73:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(VClos (_, _)|DefClos (_, _)|VDefClos _)
+File "krivine.ml", line 82, characters 2-6605:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(DefClos (Parallel (_::_::_::_), _)|DefClos (Parallel (_::[]), _)|
+DefClos (Parallel [], _)|DefClos (Sequence (_::_::_::_), _)|
+DefClos (Sequence (_::[]), _)|DefClos (Sequence [], _))
+File "krivine.ml", line 186, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 193, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 199, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 205, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 211, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 217, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 223, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 229, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 235, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 241, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 249, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 257, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+File "krivine.ml", line 265, characters 0-119:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(FuncVal (_, _)|TupleVal _)
+# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
+ocamllex.opt -q lexer.mll
+# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules lexer.ml > lexer.ml.depends
 # Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
 ocamlyacc parser.mly
 # Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
 ocamldep.opt -modules parser.mli > parser.mli.depends
 # Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
 ocamlc.opt -c -o parser.cmi parser.mli
+# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o lexer.cmo lexer.ml
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
 ocamldep.opt -modules parser.ml > parser.ml.depends
 # Target: parser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o parser.cmo parser.ml
-# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
-ocamllex.opt -q lexer.mll
-# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules lexer.ml > lexer.ml.depends
-# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
-ocamlc.opt -c -o lexer.cmo lexer.ml
+# Target: typechecker.mli.depends, tags: { extension:mli, file:typechecker.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.mli > typechecker.mli.depends
+# Target: typechecker.cmi, tags: { byte, compile, extension:mli, file:typechecker.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmi typechecker.mli
+# Target: typechecker.ml.depends, tags: { extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.ml > typechecker.ml.depends
+# Target: typechecker.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmo typechecker.ml
++ ocamlc.opt -c -o typechecker.cmo typechecker.ml
+File "typechecker.ml", line 35, characters 2-3456:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Cmp _
+File "typechecker.ml", line 186, characters 2-3021:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Cmp _
+File "typechecker.ml", line 313, characters 2-331:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Parallel (_::_::_::_)|Parallel (_::[])|Parallel []|Sequence (_::_::_::_)|
+Sequence (_::[])|Sequence [])
 # Compilation successful.

@@ -312,9 +312,7 @@ and getType g e =
 and getBinding g d =
   match d with
     Simple(s, e, t) -> (
-        let t' = getType g e
-        in
-        if t = t' then [(s, t)] else raise TypeMismatch
+        if (hastype (augment g [(s, t)]) e t) then [(s, t)] else raise TypeMismatch
       )
   | Parallel([d1; d2]) -> parallelCompose (getBinding g d1) (getBinding g d2)
   | Sequence([d1; d2]) -> (
@@ -339,3 +337,5 @@ let yields g d g_dash =
     in (aux g1)
   with  TypeMismatch -> false
       | ParDefFail -> false
+
+let fact_prog = FunctionAbstraction("X", IfThenElse(Equals(Var("X"), N(0)), N(1), Mult(Var("X"), FunctionCall(VarRec("Y"), Sub(Var("X"), N(1))))), Tint) ;;
