@@ -40,4 +40,37 @@ File "secd.ml", line 309, characters 0-82:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (BoolVal _|FuncVal (_, _)|TupVal (_, _))
+# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
+ocamllex.opt -q lexer.mll
+# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules lexer.ml > lexer.ml.depends
+# Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
+ocamlyacc parser.mly
+# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules parser.mli > parser.mli.depends
+# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o parser.cmi parser.mli
+# Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o lexer.cmo lexer.ml
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules parser.ml > parser.ml.depends
+# Target: parser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o parser.cmo parser.ml
+# Target: typechecker.mli.depends, tags: { extension:mli, file:typechecker.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.mli > typechecker.mli.depends
+# Target: typechecker.cmi, tags: { byte, compile, extension:mli, file:typechecker.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmi typechecker.mli
+# Target: typechecker.ml.depends, tags: { extension:ml, file:typechecker.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules typechecker.ml > typechecker.ml.depends
+# Target: typechecker.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:typechecker.cmo, file:typechecker.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o typechecker.cmo typechecker.ml
++ ocamlc.opt -c -o typechecker.cmo typechecker.ml
+File "typechecker.ml", line 35, characters 2-3335:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Cmp _
+File "typechecker.ml", line 180, characters 2-2986:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Cmp _
 # Compilation successful.
