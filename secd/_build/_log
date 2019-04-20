@@ -8,31 +8,35 @@ ocamldep.opt -modules secd.ml > secd.ml.depends
 # Target: secd.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:secd.cmo, file:secd.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o secd.cmo secd.ml
 + ocamlc.opt -c -o secd.cmo secd.ml
-File "secd.ml", line 267, characters 25-150:
+File "secd.ml", line 276, characters 25-150:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 []
-File "secd.ml", line 278, characters 16-66:
+File "secd.ml", line 287, characters 16-66:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (NEG|ABS|PLUS|MINUS|MULT|DIV|REM|NOT|CONJ|DISJ|CMP|EQUALS|GT|LT|GEQ|LEQ|
 PAREN|APP|RET|VAR _|NCONST _|BCONST _|IFTE (_, _)|FCALL (_, _)|TUPLE _|
 PROJ (_, _))
-File "secd.ml", line 281, characters 0-70:
+File "secd.ml", line 290, characters 0-70:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (BoolVal _|FuncVal (_, _)|TupVal (_, _))
-File "secd.ml", line 286, characters 15-64:
+File "secd.ml", line 295, characters 15-64:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (NEG|ABS|PLUS|MINUS|MULT|DIV|REM|NOT|CONJ|DISJ|CMP|EQUALS|GT|LT|GEQ|LEQ|
 PAREN|APP|RET|VAR _|NCONST _|BCONST _|IFTE (_, _)|FCALL (_, _)|TUPLE _|
 PROJ (_, _))
-File "secd.ml", line 289, characters 0-70:
+File "secd.ml", line 298, characters 0-70:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (BoolVal _|FuncVal (_, _)|TupVal (_, _))
-File "secd.ml", line 294, characters 0-71:
+File "secd.ml", line 304, characters 0-71:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(BoolVal _|FuncVal (_, _)|TupVal (_, _))
+File "secd.ml", line 309, characters 0-82:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (BoolVal _|FuncVal (_, _)|TupVal (_, _))

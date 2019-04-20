@@ -34,8 +34,11 @@ type exptree =
   | IfThenElse of exptree * exptree * exptree (* if then else fi  *)
   | Tuple of int * (exptree list)
   | Project of (int*int) * exptree   (* Proj((i,n), e)  0 < i <= n *)
+  | Let of definition * exptree
   | FunctionAbstraction of string * exptree * exptype
   | FunctionCall of exptree * exptree
+and definition =
+  Simple of string * exptree * exptype
 
 (* opcodes of the SECD (in the same sequence as above) *)
 type opcode = VAR of string | NCONST of int | BCONST of bool

@@ -34,8 +34,11 @@ type exptree =
   | IfThenElse of exptree * exptree * exptree (* if then else fi  *)
   | Tuple of int * (exptree list)
   | Project of (int*int) * exptree   (* Proj((i,n), e)  0 < i <= n *)
+  | Let of definition * exptree
   | FunctionAbstraction of string * exptree * exptype
   | FunctionCall of exptree * exptree
+and definition =
+  Simple of string * exptree * exptype
 
 (* opcodes of the SECD (in the same sequence as above) *)
 type opcode = VAR of string | NCONST of int | BCONST of bool
@@ -55,38 +58,44 @@ exception OpcodeListError
 
 (* Compile an expression into opcodes *)
 let rec compile e = match e with
-  Var(s) -> [VAR(s)]
-| N(n) -> [NCONST(n)]
-| B(b) -> [BCONST(b)]
-| Negative(e1) -> (compile e1) @ [NEG]
-| Abs(e1) -> (compile e1) @ [ABS]
-| Add(e1, e2) -> (compile e1) @ (compile e2) @ [PLUS]
-| Sub(e1, e2) -> (compile e2) @ (compile e1) @ [MINUS]
-| Mult(e1, e2) -> (compile e1) @ (compile e2) @ [MULT]
-| Div(e1, e2) -> (compile e2) @ (compile e1) @ [DIV]
-| Rem(e1, e2) -> (compile e2) @ (compile e1) @ [REM]
-| Not(e1) -> (compile e1) @ [NOT]
-| Disjunction(e1, e2) -> (compile e1) @ (compile e2) @ [DISJ]
-| Conjunction(e1, e2) -> (compile e1) @ (compile e2) @ [CONJ]
-| Cmp(es) -> (compile es) @ [CMP]
-| Equals(e1, e2) -> (compile e1) @ (compile e2) @ [EQUALS]
-| GreaterT(e1, e2) -> (compile e2) @ (compile e1) @ [GT]
-| GreaterTE(e1, e2) -> (compile e2) @ (compile e1) @ [GEQ]
-| LessT(e1, e2) -> (compile e2) @ (compile e1) @ [LT]
-| LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
-| InParen(es) -> (compile es) @ [CMP]
-| IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
-| Tuple(n, elist) -> (
-    let rec aux l acc =
-      match l with
-        [] -> acc
-      | t :: ts -> aux ts ((compile t) @ acc)
-    in
-      ( aux elist [] ) @ [ TUPLE(n) ]
-  )
-| Project((a, b), t) -> ( compile t ) @ [ PROJ(a, b) ]
-| FunctionAbstraction(s, es, t) -> [FABS(s, (compile es) @ [RET])]
-| FunctionCall(e1, e2) -> [FCALL((compile e1), (compile e2))]
+    Var(s) -> [VAR(s)]
+  | N(n) -> [NCONST(n)]
+  | B(b) -> [BCONST(b)]
+  | Negative(e1) -> (compile e1) @ [NEG]
+  | Abs(e1) -> (compile e1) @ [ABS]
+  | Add(e1, e2) -> (compile e1) @ (compile e2) @ [PLUS]
+  | Sub(e1, e2) -> (compile e2) @ (compile e1) @ [MINUS]
+  | Mult(e1, e2) -> (compile e1) @ (compile e2) @ [MULT]
+  | Div(e1, e2) -> (compile e2) @ (compile e1) @ [DIV]
+  | Rem(e1, e2) -> (compile e2) @ (compile e1) @ [REM]
+  | Not(e1) -> (compile e1) @ [NOT]
+  | Disjunction(e1, e2) -> (compile e1) @ (compile e2) @ [DISJ]
+  | Conjunction(e1, e2) -> (compile e1) @ (compile e2) @ [CONJ]
+  | Cmp(es) -> (compile es) @ [CMP]
+  | Equals(e1, e2) -> (compile e1) @ (compile e2) @ [EQUALS]
+  | GreaterT(e1, e2) -> (compile e2) @ (compile e1) @ [GT]
+  | GreaterTE(e1, e2) -> (compile e2) @ (compile e1) @ [GEQ]
+  | LessT(e1, e2) -> (compile e2) @ (compile e1) @ [LT]
+  | LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
+  | InParen(es) -> (compile es) @ [CMP]
+  | IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
+  | Tuple(n, elist) -> (
+      let rec aux l acc =
+        match l with
+          [] -> acc
+        | t :: ts -> aux ts ((compile t) @ acc)
+      in
+        ( aux elist [] ) @ [ TUPLE(n) ]
+    )
+  | Project((a, b), t) -> ( compile t ) @ [ PROJ(a, b) ]
+  | Let(d, e) -> (
+      (* Use the principle of correspondence *)
+      match d with
+        Simple(s, e1, tau) -> [FABS(s, (compile e) @ [RET])] @ (compile e1)  @ [APP]
+    )
+  | FunctionAbstraction(s, es, t) -> [FABS(s, (compile es) @ [RET])]
+  | FunctionCall(e1, e2) -> [FCALL((compile e1), (compile e2))]
+
 
 type stack_token = VClose of value * table
 and table = (string * stack_token) list
@@ -287,6 +296,12 @@ let fib_clos = match fib_opcode with FABS(s, l) -> FuncVal(s, l) ;;
 let e = [("Y", VClose(fib_clos, []))] ;;
 let c = (compile (FunctionCall(Var("Y"), N(8)))) ;;
 match secd [] e c [] with NumVal(i) -> print_endline (string_of_int i) ;;
+
+(* Fibonacci function *)
+let fib_prog = FunctionAbstraction("X", IfThenElse(Equals(Var("X"), N(0)), N(1), IfThenElse(Equals(Var("X"), N(1)), N(1), Add(FunctionCall(Var("Y"), Sub(Var("X"), N(2))), FunctionCall(Var("Y"), Sub(Var("X"), N(1)))))), Tint) ;;
+let fib_code = Let(Simple("Y", fib_prog, Tint) , FunctionCall(Var("Y"), N(8))) ;;
+let c = (compile fib_code) ;;
+match secd [] [] c [] with NumVal(i) -> print_endline (string_of_int i) ;;
 
 (* Project and tuple *)
 let tuple_prog = Project((1, 3), Tuple(3, [N(1); N(2); N(3)])) ;;
