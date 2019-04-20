@@ -7,29 +7,47 @@ type exptree =
     Var of string (* variables starting with a Capital letter, represented as alphanumeric strings with underscores (_) and apostrophes (') *)
   | N of int      (* Integer constant *)
   | B of bool     (* Boolean constant *)
+  (* unary operators on integers *)
+  | Abs of exptree                   (* abs *)
+  | Negative of exptree              (* unary minus ~ *)
   (* binary operators on integers *)
   | Add of exptree * exptree         (* Addition + *)
   | Mult of exptree * exptree        (* Multiplication * *)
   | Sub of exptree * exptree
+  | Div of exptree * exptree         (* div *)
+  | Rem of exptree * exptree         (* mod *)
+  (* unary operators on booleans *)
+  | Not of exptree
   (* binary operators on booleans *)
   | Conjunction of exptree * exptree (* conjunction /\ *)
   | Disjunction of exptree * exptree (* binary operators on booleans \/ *)
   (* comparison operations on integers *)
   | Cmp of exptree
   | Equals of exptree * exptree
+  | GreaterTE of exptree * exptree   (* >= *)
+  | LessTE of exptree * exptree      (* <= *)
+  | GreaterT of exptree * exptree    (* > *)
+  | LessT of exptree * exptree       (* < *)
   (* expressions using parenthesis *)
   | InParen of exptree               (* ( ) *)
   (* a conditional expression *)
   | IfThenElse of exptree * exptree * exptree (* if then else fi  *)
+  | Tuple of int * (exptree list)
+  | Project of (int*int) * exptree   (* Proj((i,n), e)  0 < i <= n *)
   | FunctionAbstraction of string * exptree * exptype
   | FunctionCall of exptree * exptree
 
 (* opcodes of the SECD (in the same sequence as above) *)
-type opcode = VAR of string | NCONST of int | BCONST of bool | PLUS | MINUS | MULT | CONJ | DISJ | CMP | EQUALS | PAREN | IFTE of (opcode list) * (opcode list)
+type opcode = VAR of string | NCONST of int | BCONST of bool
+| NEG | ABS | PLUS | MINUS | MULT | DIV | REM
+| NOT | CONJ | DISJ
+| CMP | EQUALS | GT | LT | GEQ | LEQ
+| PAREN | IFTE of (opcode list) * (opcode list)
 | FABS of string * (opcode list) | FCALL of (opcode list) * (opcode list) | APP | RET
+| TUPLE of int | PROJ of int * int
 
 (* The type of value returned by the definitional interpreter. *)
-type value = NumVal of int | BoolVal of bool | FuncVal of string * (opcode list)
+type value = NumVal of int | BoolVal of bool | FuncVal of string * (opcode list) | TupVal of int * (value list)
 
 exception TableError
 
@@ -40,15 +58,33 @@ let rec compile e = match e with
   Var(s) -> [VAR(s)]
 | N(n) -> [NCONST(n)]
 | B(b) -> [BCONST(b)]
+| Negative(e1) -> (compile e1) @ [NEG]
+| Abs(e1) -> (compile e1) @ [ABS]
 | Add(e1, e2) -> (compile e1) @ (compile e2) @ [PLUS]
 | Sub(e1, e2) -> (compile e2) @ (compile e1) @ [MINUS]
 | Mult(e1, e2) -> (compile e1) @ (compile e2) @ [MULT]
+| Div(e1, e2) -> (compile e2) @ (compile e1) @ [DIV]
+| Rem(e1, e2) -> (compile e2) @ (compile e1) @ [REM]
+| Not(e1) -> (compile e1) @ [NOT]
 | Disjunction(e1, e2) -> (compile e1) @ (compile e2) @ [DISJ]
 | Conjunction(e1, e2) -> (compile e1) @ (compile e2) @ [CONJ]
 | Cmp(es) -> (compile es) @ [CMP]
 | Equals(e1, e2) -> (compile e1) @ (compile e2) @ [EQUALS]
+| GreaterT(e1, e2) -> (compile e2) @ (compile e1) @ [GT]
+| GreaterTE(e1, e2) -> (compile e2) @ (compile e1) @ [GEQ]
+| LessT(e1, e2) -> (compile e2) @ (compile e1) @ [LT]
+| LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
 | InParen(es) -> (compile es) @ [CMP]
 | IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
+| Tuple(n, elist) -> (
+    let rec aux l acc =
+      match l with
+        [] -> acc
+      | t :: ts -> aux ts ((compile t) @ acc)
+    in
+      ( aux elist [] ) @ [ TUPLE(n) ]
+  )
+| Project((a, b), t) -> ( compile t ) @ [ PROJ(a, b) ]
 | FunctionAbstraction(s, es, t) -> [FABS(s, (compile es) @ [RET])]
 | FunctionCall(e1, e2) -> [FCALL((compile e1), (compile e2))]
 
@@ -78,6 +114,16 @@ let rec secd s e c d = match c with
     in
     match el with VClose(v, t) -> secd (VClose(v, (augment t x el)) :: s) e c_dash d
   )
+| NEG :: c_dash -> (
+    match s with
+      VClose(NumVal(n), t) :: s_dash -> secd (VClose(NumVal(-n), t) :: s) e c_dash d
+    | _ -> raise (StackError "Negative does not find an integer on the stack")
+  )
+| ABS :: c_dash -> (
+    match s with
+      VClose(NumVal(n), t) :: s_dash -> secd (VClose(NumVal(abs n), t) :: s) e c_dash d
+    | _ -> raise (StackError "Abs does not find an integer on the stack")
+  )
 | PLUS :: c_dash -> (
     match s with
       VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
@@ -98,6 +144,27 @@ let rec secd s e c d = match c with
           secd (VClose(NumVal(n1 * n2), e) :: s_dash) e c_dash d
         )
     | _ -> raise (StackError "Multiplication does not find two numbers on the stack")
+  )
+| DIV :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(NumVal(n1 / n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Division does not find two numbers on the stack")
+  )
+| REM :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(NumVal(n1 - n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Remainder does not find two numbers on the stack")
+  )
+| NOT :: c_dash -> (
+    match s with
+      VClose(BoolVal(b), t) :: s_dash -> (
+        secd (VClose(BoolVal(not b), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Not does not find a number on the stack")
   )
 | DISJ :: c_dash -> (
     match s with
@@ -120,6 +187,34 @@ let rec secd s e c d = match c with
         )
     | _ -> raise (StackError "Compare does not find a number on the stack")
   )
+| GT :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 > n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Greater than does not find two numbers on the stack")
+  )
+| GEQ :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 >= n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Greater than or equal to does not find two numbers on the stack")
+  )
+| LT :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 < n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Less than does not find two numbers on the stack")
+  )
+| LEQ :: c_dash -> (
+    match s with
+      VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
+          secd (VClose(BoolVal(n1 <= n2), e) :: s_dash) e c_dash d
+        )
+    | _ -> raise (StackError "Less than or equal to does not find two numbers on the stack")
+  )
 | EQUALS :: c_dash -> (
     match s with
       VClose(NumVal(n1), t1) :: VClose(NumVal(n2), t2) :: s_dash -> (
@@ -127,6 +222,7 @@ let rec secd s e c d = match c with
         )
     | _ -> raise (StackError "Equals does not find two numbers on the stack")
   )
+
 | PAREN :: c_dash -> secd s e c d
 | IFTE(c1, c2) :: c_dash -> (
     match s with
@@ -145,6 +241,25 @@ let rec secd s e c d = match c with
           secd [] (augment e_func x v) c_func ((s_dash, e, c_dash) :: d)
         )
     | _ -> raise (StackError "Apply does not find a value closure and FunctionVal on the stack")
+  )
+| TUPLE(n) :: c_dash -> (
+    let rec aux m stack acc =
+      if m = 0 then (acc, stack)
+      else
+        match stack with
+          VClose(s1, r) :: s_rem -> aux (m-1) s_rem (acc @ [s1])
+        | _ -> raise (StackError "Tuple did not find enough numbers on the stack")
+    in
+    match aux n s [] with
+      (t, stack_rem) -> secd (VClose(TupVal(n, t), e) :: stack_rem) e c_dash d
+  )
+| PROJ(a, b) :: c_dash -> (
+    match s with
+      VClose(TupVal(n, t), t1) :: s_rem -> (
+          if n != b then raise (StackError "Project does not match length")
+          else secd (VClose((List.nth t (a-1)), t1) :: s_rem) e c_dash d
+        )
+      | _ -> raise (StackError "Proj did not find Tuple on the stack")
   )
 | [RET] -> (
     (* Remove the value from the stack and dump *)
@@ -172,3 +287,8 @@ let fib_clos = match fib_opcode with FABS(s, l) -> FuncVal(s, l) ;;
 let e = [("Y", VClose(fib_clos, []))] ;;
 let c = (compile (FunctionCall(Var("Y"), N(8)))) ;;
 match secd [] e c [] with NumVal(i) -> print_endline (string_of_int i) ;;
+
+(* Project and tuple *)
+let tuple_prog = Project((1, 3), Tuple(3, [N(1); N(2); N(3)])) ;;
+let tuple_opcode = (compile tuple_prog) ;;
+match secd [] [] c [] with NumVal(i) -> print_endline (string_of_int i) ;;

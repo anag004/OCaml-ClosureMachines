@@ -32,6 +32,8 @@ type exptree =
   | InParen of exptree               (* ( ) *)
   (* a conditional expression *)
   | IfThenElse of exptree * exptree * exptree (* if then else fi  *)
+  | Tuple of int * (exptree list)
+  | Project of (int*int) * exptree   (* Proj((i,n), e)  0 < i <= n *)
   | FunctionAbstraction of string * exptree * exptype
   | FunctionCall of exptree * exptree
 
@@ -42,9 +44,10 @@ type opcode = VAR of string | NCONST of int | BCONST of bool
 | CMP | EQUALS | GT | LT | GEQ | LEQ
 | PAREN | IFTE of (opcode list) * (opcode list)
 | FABS of string * (opcode list) | FCALL of (opcode list) * (opcode list) | APP | RET
+| TUPLE of int | PROJ of int * int
 
 (* The type of value returned by the definitional interpreter. *)
-type value = NumVal of int | BoolVal of bool | FuncVal of string * (opcode list)
+type value = NumVal of int | BoolVal of bool | FuncVal of string * (opcode list) | TupVal of int * (value list)
 
 exception TableError
 
@@ -73,6 +76,15 @@ let rec compile e = match e with
 | LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
 | InParen(es) -> (compile es) @ [CMP]
 | IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
+| Tuple(n, elist) -> (
+    let rec aux l acc =
+      match l with
+        [] -> acc
+      | t :: ts -> aux ts ((compile t) @ acc)
+    in
+      ( aux elist [] ) @ [ TUPLE(n) ]
+  )
+| Project((a, b), t) -> ( compile t ) @ [ PROJ(a, b) ]
 | FunctionAbstraction(s, es, t) -> [FABS(s, (compile es) @ [RET])]
 | FunctionCall(e1, e2) -> [FCALL((compile e1), (compile e2))]
 
@@ -230,6 +242,25 @@ let rec secd s e c d = match c with
         )
     | _ -> raise (StackError "Apply does not find a value closure and FunctionVal on the stack")
   )
+| TUPLE(n) :: c_dash -> (
+    let rec aux m stack acc =
+      if m = 0 then (acc, stack)
+      else
+        match stack with
+          VClose(s1, r) :: s_rem -> aux (m-1) s_rem (acc @ [s1])
+        | _ -> raise (StackError "Tuple did not find enough numbers on the stack")
+    in
+    match aux n s [] with
+      (t, stack_rem) -> secd (VClose(TupVal(n, t), e) :: stack_rem) e c_dash d
+  )
+| PROJ(a, b) :: c_dash -> (
+    match s with
+      VClose(TupVal(n, t), t1) :: s_rem -> (
+          if n != b then raise (StackError "Project does not match length")
+          else secd (VClose((List.nth t (a-1)), t1) :: s_rem) e c_dash d
+        )
+      | _ -> raise (StackError "Proj did not find Tuple on the stack")
+  )
 | [RET] -> (
     (* Remove the value from the stack and dump *)
     match s with
@@ -256,3 +287,8 @@ let fib_clos = match fib_opcode with FABS(s, l) -> FuncVal(s, l) ;;
 let e = [("Y", VClose(fib_clos, []))] ;;
 let c = (compile (FunctionCall(Var("Y"), N(8)))) ;;
 match secd [] e c [] with NumVal(i) -> print_endline (string_of_int i) ;;
+
+(* Project and tuple *)
+let tuple_prog = Project((1, 3), Tuple(3, [N(1); N(2); N(3)])) ;;
+let tuple_opcode = (compile tuple_prog) ;;
+match secd [] [] tuple_opcode [] with NumVal(i) -> print_endline (string_of_int i) ;;

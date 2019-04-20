@@ -1,33 +1,39 @@
 ### Starting build.
-# Target: a1.mli.depends, tags: { extension:mli, file:a1.mli, ocaml, ocamldep, quiet }
-ocamldep.opt -modules a1.mli > a1.mli.depends
-# Target: a1.cmi, tags: { byte, compile, extension:mli, file:a1.mli, interf, ocaml, quiet }
-ocamlc.opt -c -o a1.cmi a1.mli
-# Target: a1.ml.depends, tags: { extension:ml, file:a1.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules a1.ml > a1.ml.depends
-# Target: a1.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:a1.cmo, file:a1.ml, implem, ocaml, quiet }
-ocamlc.opt -c -o a1.cmo a1.ml
-+ ocamlc.opt -c -o a1.cmo a1.ml
-File "a1.ml", line 152, characters 25-150:
+# Target: secd.mli.depends, tags: { extension:mli, file:secd.mli, ocaml, ocamldep, quiet }
+ocamldep.opt -modules secd.mli > secd.mli.depends
+# Target: secd.cmi, tags: { byte, compile, extension:mli, file:secd.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o secd.cmi secd.mli
+# Target: secd.ml.depends, tags: { extension:ml, file:secd.ml, ocaml, ocamldep, quiet }
+ocamldep.opt -modules secd.ml > secd.ml.depends
+# Target: secd.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:secd.cmo, file:secd.ml, implem, ocaml, quiet }
+ocamlc.opt -c -o secd.cmo secd.ml
++ ocamlc.opt -c -o secd.cmo secd.ml
+File "secd.ml", line 267, characters 25-150:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 []
-File "a1.ml", line 163, characters 16-66:
+File "secd.ml", line 278, characters 16-66:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(PLUS|MINUS|MULT|CONJ|DISJ|CMP|EQUALS|PAREN|APP|RET|VAR _|NCONST _|BCONST _|
-IFTE (_, _)|FCALL (_, _))
-File "a1.ml", line 166, characters 0-70:
+(NEG|ABS|PLUS|MINUS|MULT|DIV|REM|NOT|CONJ|DISJ|CMP|EQUALS|GT|LT|GEQ|LEQ|
+PAREN|APP|RET|VAR _|NCONST _|BCONST _|IFTE (_, _)|FCALL (_, _)|TUPLE _|
+PROJ (_, _))
+File "secd.ml", line 281, characters 0-70:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(BoolVal _|FuncVal (_, _))
-File "a1.ml", line 171, characters 15-64:
+(BoolVal _|FuncVal (_, _)|TupVal (_, _))
+File "secd.ml", line 286, characters 15-64:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(PLUS|MINUS|MULT|CONJ|DISJ|CMP|EQUALS|PAREN|APP|RET|VAR _|NCONST _|BCONST _|
-IFTE (_, _)|FCALL (_, _))
-File "a1.ml", line 174, characters 0-70:
+(NEG|ABS|PLUS|MINUS|MULT|DIV|REM|NOT|CONJ|DISJ|CMP|EQUALS|GT|LT|GEQ|LEQ|
+PAREN|APP|RET|VAR _|NCONST _|BCONST _|IFTE (_, _)|FCALL (_, _)|TUPLE _|
+PROJ (_, _))
+File "secd.ml", line 289, characters 0-70:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(BoolVal _|FuncVal (_, _))
+(BoolVal _|FuncVal (_, _)|TupVal (_, _))
+File "secd.ml", line 294, characters 0-71:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(BoolVal _|FuncVal (_, _)|TupVal (_, _))
 # Compilation successful.
