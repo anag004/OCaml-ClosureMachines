@@ -332,4 +332,3 @@ let yields g d g_dash =
       | ParDefFail -> false
 
 let fact_prog = FunctionAbstraction("X", IfThenElse(Equals(Var("X"), N(0)), N(1), Mult(Var("X"), FunctionCall(Var("Y"), Sub(Var("X"), N(1))))), Tint) ;;
-git a
