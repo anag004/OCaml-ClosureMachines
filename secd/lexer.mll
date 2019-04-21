@@ -4,7 +4,7 @@
 }
 
 (* ====================== Some definitions ================================================ *)
-let whitespace = [' ' '\t']+
+let whitespace = [' ' '\t' '\n']+
 let digits = ['0'-'9']                                        (* All single digits *)
 let nzdigits = ['1'-'9']                                      (* Non-zero digits *)
 let intConstant = ('0' | nzdigits digits*)                    (* Regex for non-negative integers  *)

@@ -77,7 +77,7 @@ let rec compile e = match e with
   | GreaterTE(e1, e2) -> (compile e2) @ (compile e1) @ [GEQ]
   | LessT(e1, e2) -> (compile e2) @ (compile e1) @ [LT]
   | LessTE(e1, e2) -> (compile e2) @ (compile e1) @ [LEQ]
-  | InParen(es) -> (compile es) @ [CMP]
+  | InParen(es) -> (compile es) @ [PAREN]
   | IfThenElse(e1, e2, e3) -> (compile e1) @ [IFTE((compile e2), (compile e3))]
   | Tuple(n, elist) -> (
       let rec aux l acc =
@@ -232,7 +232,7 @@ let rec secd s e c d = match c with
     | _ -> raise (StackError "Equals does not find two numbers on the stack")
   )
 
-| PAREN :: c_dash -> secd s e c d
+| PAREN :: c_dash -> secd s e c_dash d
 | IFTE(c1, c2) :: c_dash -> (
     match s with
       VClose(BoolVal(b), t) :: s_dash -> (

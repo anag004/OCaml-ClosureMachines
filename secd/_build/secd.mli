@@ -53,7 +53,6 @@ type opcode = VAR of string | NCONST of int | BCONST of bool
 type value = NumVal of int | BoolVal of bool | FuncVal of string * (opcode list) | TupVal of int * (value list)
 
 exception TableError
-
 exception OpcodeListError
 
 type stack_token = VClose of value * table
