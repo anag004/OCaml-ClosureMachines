@@ -10,7 +10,7 @@ This is a toy language written from scratch (including lexer, parser) in OCaml. 
 
 ## Features
 
-This is Turing complete language which supports recursion, functions and variables. Here are some representative examples taken from the `test_secd.ml` file.
+This is Turing complete language which supports recursion, functions and variables along with strict typechecking. Here are some representative examples taken from the `test_secd.ml` file.
 
 1. Calculate GCD recursively
 
